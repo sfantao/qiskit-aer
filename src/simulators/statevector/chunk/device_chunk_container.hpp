@@ -89,12 +89,12 @@ public:
   }
   ~DeviceChunkContainer();
 
-  uint_t size(void) { return data_.size(); }
-  int device(void) { return device_id_; }
+  uint_t size(void) override { return data_.size(); }
+  int device(void) override { return device_id_; }
 
   AERDeviceVector<thrust::complex<data_t>> &vector(void) { return data_; }
 
-  bool peer_access(int i_dest) {
+  bool peer_access(int i_dest) override {
     if (i_dest < 0) {
 #ifdef AER_ATS
       // for IBM AC922
@@ -106,7 +106,7 @@ public:
     return peer_access_[i_dest];
   }
 
-  thrust::complex<data_t> &operator[](uint_t i) {
+  thrust::complex<data_t> &operator[](uint_t i) override {
     return raw_reference_cast(data_[i]);
   }
 
@@ -125,14 +125,14 @@ public:
 
   void calculate_matrix_buffer_size(int bits);
 
-  void set_device(void) const {
+  void set_device(void) const override {
 #ifdef AER_THRUST_GPU
     cudaSetDevice(device_id_);
 #endif
   }
 
 #ifdef AER_THRUST_GPU
-  cudaStream_t stream(uint_t iChunk) const {
+  cudaStream_t stream(uint_t iChunk) const override {
     if (iChunk >= this->num_chunks_)
       return stream_[(num_matrices_ + iChunk - this->num_chunks_)];
     if (num_matrices_ == 1)
@@ -141,8 +141,10 @@ public:
   }
 #endif
 
-  void Set(uint_t i, const thrust::complex<data_t> &t) { data_[i] = t; }
-  thrust::complex<data_t> Get(uint_t i) const { return data_[i]; }
+  void Set(uint_t i, const thrust::complex<data_t> &t) override {
+    data_[i] = t;
+  }
+  thrust::complex<data_t> Get(uint_t i) const override { return data_[i]; }
 
   void CopyIn(Chunk<data_t> &src, uint_t iChunk) override;
   void CopyOut(Chunk<data_t> &src, uint_t iChunk) override;
@@ -160,16 +162,16 @@ public:
                        uint_t stride = 1, bool dot = true,
                        uint_t count = 1) const override;
 
-  thrust::complex<data_t> *chunk_pointer(uint_t iChunk) const {
+  thrust::complex<data_t> *chunk_pointer(uint_t iChunk) const override {
     return (thrust::complex<data_t> *)thrust::raw_pointer_cast(data_.data()) +
            (iChunk << this->chunk_bits_);
   }
-  thrust::complex<data_t> *buffer_pointer(void) const {
+  thrust::complex<data_t> *buffer_pointer(void) const override {
     return (thrust::complex<data_t> *)thrust::raw_pointer_cast(data_.data()) +
            (this->num_chunks_ << this->chunk_bits_);
   }
 
-  thrust::complex<double> *matrix_pointer(uint_t iChunk) const {
+  thrust::complex<double> *matrix_pointer(uint_t iChunk) const override {
     if (iChunk >= this->num_chunks_) { // for buffer chunks
       return ((thrust::complex<double> *)thrust::raw_pointer_cast(
                  matrix_.data())) +
@@ -186,7 +188,7 @@ public:
     }
   }
 
-  uint_t *param_pointer(uint_t iChunk) const {
+  uint_t *param_pointer(uint_t iChunk) const override {
     if (iChunk >= this->num_chunks_) { // for buffer chunks
       return ((uint_t *)thrust::raw_pointer_cast(params_.data())) +
              ((num_matrices_ + iChunk - this->num_chunks_) *
@@ -200,20 +202,20 @@ public:
     }
   }
 
-  double *reduce_buffer(uint_t iChunk) const {
+  double *reduce_buffer(uint_t iChunk) const override {
     return ((double *)thrust::raw_pointer_cast(reduce_buffer_.data()) +
             iChunk * reduce_buffer_size_);
   }
-  uint_t reduce_buffer_size() const { return reduce_buffer_size_; }
-  double *probability_buffer(uint_t iChunk) const {
+  uint_t reduce_buffer_size() const override { return reduce_buffer_size_; }
+  double *probability_buffer(uint_t iChunk) const override {
     return ((double *)thrust::raw_pointer_cast(probability_buffer_.data()) +
             iChunk * QV_PROBABILITY_BUFFER_SIZE);
   }
 
-  void copy_to_probability_buffer(std::vector<double> &buf, int pos);
+  void copy_to_probability_buffer(std::vector<double> &buf, int pos) override;
 
-  void allocate_creg(uint_t num_mem, uint_t num_reg);
-  int measured_cbit(uint_t iChunk, int qubit) {
+  void allocate_creg(uint_t num_mem, uint_t num_reg) override;
+  int measured_cbit(uint_t iChunk, int qubit) override {
     uint_t n64, i64, ibit;
     if (qubit >= this->num_creg_bits_)
       return -1;
@@ -281,14 +283,14 @@ public:
     }
   }
 
-  uint_t *creg_buffer(uint_t iChunk) const {
+  uint_t *creg_buffer(uint_t iChunk) const override {
     uint_t n64;
     n64 = (this->num_creg_bits_ + 63) >> 6;
     return ((uint_t *)thrust::raw_pointer_cast(cregs_.data()) + iChunk * n64);
   }
-  void request_creg_update(void) { creg_host_update_ = true; }
+  void request_creg_update(void) override { creg_host_update_ = true; }
 
-  void synchronize(uint_t iChunk) {
+  void synchronize(uint_t iChunk) override {
 #ifdef AER_THRUST_GPU
     set_device();
     cudaStreamSynchronize(stream(iChunk));
@@ -296,14 +298,14 @@ public:
   }
 
   // set qubits to be blocked
-  void set_blocked_qubits(uint_t iChunk, const reg_t &qubits);
+  void set_blocked_qubits(uint_t iChunk, const reg_t &qubits) override;
 
   // do all gates stored in queue
-  void apply_blocked_gates(uint_t iChunk);
+  void apply_blocked_gates(uint_t iChunk) override;
 
   // queue gate for blocked execution
   void queue_blocked_gate(uint_t iChunk, char gate, uint_t qubit, uint_t mask,
-                          const std::complex<double> *pMat = NULL);
+                          const std::complex<double> *pMat = NULL) override;
 };
 
 template <typename data_t>

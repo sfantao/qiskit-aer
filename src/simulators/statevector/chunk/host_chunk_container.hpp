@@ -35,11 +35,15 @@ public:
   HostChunkContainer() {}
   ~HostChunkContainer();
 
-  uint_t size(void) { return data_.size(); }
+  uint_t size(void) override { return data_.size(); }
 
-  AERHostVector<thrust::complex<data_t>> &vector(void) { return data_; }
+  AERHostVector<thrust::complex<data_t>> &vector(void) {
+    return data_;
+  }
 
-  thrust::complex<data_t> &operator[](uint_t i) { return data_[i]; }
+  thrust::complex<data_t> &operator[](uint_t i) override {
+    return data_[i];
+  }
 
   uint_t Allocate(int idev, int chunk_bits, int num_qubits, uint_t chunks,
                   uint_t buffers, bool multi_shots, int matrix_bit,
@@ -59,7 +63,7 @@ public:
                        uint_t iChunk) const override {
     params_[iChunk] = (uint_t *)&prm[0];
   }
-  void ResizeMatrixBuffers(int bits) {}
+  void ResizeMatrixBuffers(int bits) override {}
 
   void Set(uint_t i, const thrust::complex<data_t> &t) override {
     data_[i] = t;
@@ -70,7 +74,7 @@ public:
     return (thrust::complex<data_t> *)thrust::raw_pointer_cast(data_.data()) +
            (iChunk << this->chunk_bits_);
   }
-  thrust::complex<data_t> *buffer_pointer(void) const {
+  thrust::complex<data_t> *buffer_pointer(void) const override {
     return (thrust::complex<data_t> *)thrust::raw_pointer_cast(data_.data()) +
            (this->num_chunks_ << this->chunk_bits_);
   }
@@ -83,7 +87,7 @@ public:
     return params_[iChunk];
   }
 
-  bool peer_access(int i_dest) {
+  bool peer_access(int i_dest) override {
 #ifdef AER_ATS
     // for IBM AC922
     return true;

@@ -475,7 +475,6 @@ if(AER_THRUST_SUPPORTED)
     list(APPEND ROCM_EXTRA_FLAGS -ferror-limit=3
                                  -Wno-unused-lambda-capture
                                  -Wno-bitwise-instead-of-logical
-                                 -Wno-inconsistent-missing-override
                                  -Wno-cast-align
                                  -Wno-float-equal
                                  -Wno-unused-variable

@@ -70,7 +70,7 @@ public:
 protected:
   void set_config(const Config &config) override;
 
-  virtual uint_t qubit_scale(void) { return 1; }
+  virtual uint_t qubit_scale(void) override { return 1; }
 
   bool multiple_chunk_required(const Circuit &circuit,
                                const Noise::NoiseModel &noise) const;
@@ -191,7 +191,7 @@ protected:
   auto apply_to_matrix(bool copy = false);
 
   // Apply the global phase
-  virtual void apply_global_phase();
+  virtual void apply_global_phase() override;
 
   uint_t mapped_index(const uint_t idx);
 };

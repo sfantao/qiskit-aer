@@ -56,7 +56,7 @@ public:
 #else
   static std::string name() { return "density_matrix_thrust"; }
 #endif
-  virtual bool is_density_matrix(void) { return true; }
+  virtual bool is_density_matrix(void) override { return true; }
 
   // Initializes the current vector so that all qubits are in the |0> state.
   void initialize();
@@ -156,7 +156,8 @@ public:
   // optimized 1 qubit measure (async)
   virtual void apply_batched_measure(const reg_t &qubits,
                                      std::vector<RngEngine> &rng,
-                                     const reg_t &cmemory, const reg_t &cregs);
+                                     const reg_t &cmemory,
+                                     const reg_t &cregs) override;
 
   virtual void apply_reset(const reg_t &qubits);
 
@@ -545,7 +546,7 @@ public:
       cmask_ |= (1ull << qubits[i]);
     enable_batch_ = batch;
   }
-  bool is_diagonal(void) { return true; }
+  bool is_diagonal(void) override { return true; }
   bool batch_enable(void) override { return enable_batch_; }
 
   __host__ __device__ void operator()(const uint_t &i) const {
@@ -594,7 +595,7 @@ public:
       vec1[i] = q0;
     }
   }
-  const char *name(void) { return "DensityMCXY"; }
+  const char *name(void) override { return "DensityMCXY"; }
 };
 
 template <typename data_t>
@@ -633,7 +634,7 @@ public:
       cmask_ |= (1ull << qubits[i]);
     enable_batch_ = batch;
   }
-  bool is_diagonal(void) { return true; }
+  bool is_diagonal(void) override { return true; }
   bool batch_enable(void) override { return enable_batch_; }
 
   __host__ __device__ void operator()(const uint_t &i) const {
@@ -691,7 +692,7 @@ public:
       vec1[i] = s1 * q0;
     }
   }
-  const char *name(void) { return "DensityMCXY"; }
+  const char *name(void) override { return "DensityMCXY"; }
 };
 
 template <typename data_t>
@@ -792,7 +793,7 @@ public:
     enable_batch_ = batch;
   }
 
-  int qubits_count(void) { return 2; }
+  int qubits_count(void) override { return 2; }
   bool batch_enable(void) override { return enable_batch_; }
 
   __host__ __device__ void operator()(const uint_t &i) const {
@@ -830,7 +831,7 @@ public:
     }
     vec3[i0] = q3;
   }
-  const char *name(void) { return "DensityCPhase"; }
+  const char *name(void) override { return "DensityCPhase"; }
 };
 
 template <typename data_t>
