@@ -586,8 +586,7 @@ double Executor<state_t>::expval_pauli(const reg_t &qubits,
       const uint_t mask_u = ~((1ull << (x_max + 1)) - 1);
       const uint_t mask_l = (1ull << x_max) - 1;
       if (on_same_process) {
-        auto apply_expval_pauli_chunk = [this, x_mask, z_mask, x_max, mask_u,
-                                         mask_l, qubits_in_chunk,
+        auto apply_expval_pauli_chunk = [this, x_mask, z_mask, qubits_in_chunk,
                                          pauli_in_chunk, phase](int_t iGroup) {
           double expval = 0.0;
           for (int_t iChunk = Base::top_state_of_group_[iGroup];

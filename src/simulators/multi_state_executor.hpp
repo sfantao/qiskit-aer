@@ -473,7 +473,7 @@ void MultiStateExecutor<state_t>::run_circuit_with_shot_branching(
     while (num_active_states > 0) { // loop until all branches execute all ops
       // functor for ops execution
       auto apply_ops_func = [this, &branches, &noise, &par_results, measure_seq,
-                             par_shots, num_active_states](int_t i) {
+                             par_shots](int_t i) {
         uint_t istate, state_end;
         istate = branches.size() * i / par_shots;
         state_end = branches.size() * (i + 1) / par_shots;

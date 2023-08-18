@@ -473,7 +473,6 @@ if(AER_THRUST_SUPPORTED)
     
     # Add some warning flags to allow existing code to go through with clang.
     list(APPEND ROCM_EXTRA_FLAGS -ferror-limit=3
-                                 -Wno-unused-lambda-capture
                                  -Wno-bitwise-instead-of-logical
                                  -Wno-inconsistent-missing-override
                                  -Wno-cast-align
