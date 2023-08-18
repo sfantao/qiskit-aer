@@ -905,7 +905,7 @@ public:
   __host__ __device__ void
   run_with_cache(uint_t _tid, uint_t _idx,
                  thrust::complex<data_t> *_cache) const {
-    uint_t j, threadID;
+    uint_t j;
     thrust::complex<data_t> q, r;
     thrust::complex<double> m;
     uint_t mat_size, irow;
@@ -1671,7 +1671,6 @@ public:
   CSwapChunk_func(const reg_t &qubits, uint_t block_bits,
                   thrust::complex<data_t> *pVec0,
                   thrust::complex<data_t> *pVec1, bool wb) {
-    int i;
     int nqubits;
     int qubit_t;
     nqubits = qubits.size();

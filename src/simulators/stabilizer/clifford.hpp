@@ -524,7 +524,7 @@ bool Clifford::measure_and_update(const uint64_t qubit,
         if (destabilizer_table_[qubit].X[i]) {
           bool b0 = false, b1 = false;
           for (size_t q = 0; q < num_qubits_; q++) {
-            bool t0, t1, add;
+            bool t0, t1;
             bool accumX = accum.X[q];
             bool accumZ = accum.Z[q];
 

@@ -381,7 +381,7 @@ template <class state_t>
 void BatchShotsExecutor<state_t>::apply_batched_noise_ops(
     const int_t i_group, const std::vector<std::vector<Operations::Op>> &ops,
     ExperimentResult &result, std::vector<RngEngine> &rng) {
-  int_t i, j, k, count, nop, pos = 0;
+  int_t i, j, k, count = 0;
   uint_t istate = Base::top_state_of_group_[i_group];
   count = ops.size();
 

@@ -148,7 +148,6 @@ inline void to_json(json_t &js, const UnitaryMatrixThrust<data_t> &qmat) {
 template <class data_t>
 json_t UnitaryMatrixThrust<data_t>::json() const {
   const int_t nrows = rows_;
-  int iPlace;
   int_t i, irow, icol;
   uint_t csize = BaseVector::data_size_;
   cvector_t<data_t> tmp(csize);
@@ -213,10 +212,9 @@ UnitaryMatrixThrust<data_t>::copy_to_matrix() const {
   cvector_t<data_t> qreg = BaseVector::vector();
 
   int_t i;
-  uint_t irow, icol;
-#pragma omp parallel for private(                                              \
-    i, irow, icol) if (BaseVector::num_qubits_ > BaseVector::omp_threshold_ && \
-                       BaseVector::omp_threads_ > 1)                           \
+#pragma omp parallel for private(                                  \
+    i) if (BaseVector::num_qubits_ > BaseVector::omp_threshold_ && \
+                       BaseVector::omp_threads_ > 1)               \
     num_threads(BaseVector::omp_threads_)
   for (i = 0; i < csize; i++) {
     ret[i] = qreg[i];
@@ -330,9 +328,7 @@ std::pair<bool, double> UnitaryMatrixThrust<data_t>::check_identity() const {
 
   // Check conditions 2 and 3
   double delta = 0.;
-  int iPlace;
-  uint_t i, irow, icol, ic, nc;
-  uint_t pos = 0;
+  uint_t i, irow, icol;
   uint_t csize = BaseVector::data_size_;
   cvector_t<data_t> tmp(csize);
 

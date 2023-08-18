@@ -422,7 +422,7 @@ size_t Controller::get_system_memory_mb() {
 size_t Controller::get_gpu_memory_mb() {
   size_t total_physical_memory = 0;
 #ifdef AER_THRUST_GPU
-  int iDev, nDev, j;
+  int iDev, nDev;
   if (cudaGetDeviceCount(&nDev) != cudaSuccess) {
     cudaGetLastError();
     nDev = 0;

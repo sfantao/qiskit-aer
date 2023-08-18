@@ -532,7 +532,6 @@ void DeviceChunkContainer<data_t>::calculate_matrix_buffer_size(int bits) {
 
 template <typename data_t>
 void DeviceChunkContainer<data_t>::ResizeMatrixBuffers(int bits) {
-  uint_t size;
   uint_t n = num_matrices_ + this->num_buffers_;
 
   if (bits != this->matrix_bits_) {
@@ -990,7 +989,7 @@ void DeviceChunkContainer<data_t>::queue_blocked_gate(
 
   cvector_t<double> mat(4, 0.0);
   int i;
-  uint_t idx, idxParam, iBlock;
+  uint_t iBlock;
   if (iChunk >= this->num_chunks_) { // for buffer chunks
     iBlock = num_matrices_ + iChunk - this->num_chunks_;
   } else {

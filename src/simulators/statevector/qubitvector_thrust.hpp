@@ -1507,7 +1507,6 @@ void QubitVectorThrust<data_t>::apply_multiplexer(
   for (const auto &q : control_qubits) {
     qubits.push_back(q);
   }
-  size_t N = qubits.size();
 
   cvector_t<double> matMP(DIM * DIM, 0.0);
   uint_t b, i, j;
@@ -2027,7 +2026,6 @@ public:
   bool is_diagonal(void) { return true; }
 
   __host__ __device__ void operator()(const uint_t &i) const {
-    thrust::complex<data_t> q;
     thrust::complex<data_t> *vec;
     double scale;
     uint_t *qubits;
@@ -2292,7 +2290,6 @@ public:
   bool is_diagonal(void) { return true; }
 
   __host__ __device__ void operator()(const uint_t &i) const {
-    thrust::complex<data_t> q;
     thrust::complex<data_t> *vec;
     double scale;
     uint_t *qubits;
@@ -2490,7 +2487,6 @@ public:
     uint_t *mask;
     uint_t val = 1;
     n64 = (this->num_creg_bits_ + 63) >> 6;
-    int j;
 
     mask = this->params_;
 
@@ -2808,7 +2804,6 @@ void QubitVectorThrust<data_t>::apply_batched_pauli_ops(
   }
   uint_t count = ops.size();
   int num_inner_threads = omp_get_max_threads() / num_threads_per_group_;
-  int_t i;
 
   reg_t params(4 * count);
 
@@ -2885,7 +2880,6 @@ public:
     thrust::complex<data_t> q0, q1;
     thrust::complex<data_t> *vec0;
     thrust::complex<data_t> *vec1;
-    double p, p0, p1, rnd;
 
     uint_t iChunk = i >> this->chunk_bits_;
     double scale =
@@ -2922,7 +2916,7 @@ public:
   __host__ __device__ void
   run_with_cache(uint_t _tid, uint_t _idx,
                  thrust::complex<data_t> *_cache) const {
-    uint_t j, threadID;
+    uint_t j;
     thrust::complex<data_t> q, r;
     thrust::complex<double> m;
     uint_t mat_size, irow;
@@ -2976,7 +2970,6 @@ public:
   __host__ __device__ void operator()(const uint_t &i) const {
     uint_t iChunk = i;
     double p0, p1, rnd;
-    bool mult = false;
 
     p0 = reduce_[iChunk * reduce_buf_size_];
     probs_[iChunk + QV_RESET_CURRENT_PROB * prob_buf_size_] = p0;
@@ -3013,7 +3006,6 @@ void QubitVectorThrust<data_t>::apply_batched_kraus(
     std::vector<RngEngine> &rng) {
   const size_t N = qubits.size();
   uint_t i, count;
-  double ret;
 
   count = chunk_.container()->num_chunks();
 
@@ -3287,7 +3279,7 @@ void QubitVectorThrust<data_t>::apply_roerror(const Operations::Op &op,
 
   reg_t params;
   std::vector<double> probs;
-  int_t i, j, offset;
+  int_t i, offset;
 
   for (i = 0; i < op.memory.size(); i++)
     params.push_back(op.memory[i]);

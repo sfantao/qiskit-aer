@@ -402,7 +402,6 @@ const stringmap_t<Gates> State<statevec_t>::gateset_(
 
 template <class statevec_t>
 void State<statevec_t>::initialize_qreg(uint_t num_qubits) {
-  int_t i;
   initialize_omp();
 
   BaseState::qreg_.set_num_qubits(num_qubits);
@@ -426,7 +425,6 @@ void State<statevec_t>::initialize_statevector(uint_t num_qubits,
 
 template <class statevec_t>
 void State<statevec_t>::initialize_omp() {
-  uint_t i;
 
   BaseState::qreg_.set_omp_threshold(omp_qubit_threshold_);
   if (BaseState::threads_ > 0) // set allowed OMP threads in qubitvector
@@ -1024,7 +1022,7 @@ template <class statevec_t>
 std::vector<reg_t> State<statevec_t>::sample_measure(const reg_t &qubits,
                                                      uint_t shots,
                                                      RngEngine &rng) {
-  int_t i, j;
+  int_t i;
   // Generate flat register for storing
   std::vector<double> rnds;
   rnds.reserve(shots);

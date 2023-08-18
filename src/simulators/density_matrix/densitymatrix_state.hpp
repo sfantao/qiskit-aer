@@ -359,7 +359,6 @@ void State<densmat_t>::initialize_qreg(uint_t num_qubits, densmat_t &&state) {
 
 template <class densmat_t>
 void State<densmat_t>::initialize_omp() {
-  uint_t i;
   BaseState::qreg_.set_omp_threshold(omp_qubit_threshold_);
   if (BaseState::threads_ > 0)
     BaseState::qreg_.set_omp_threads(
@@ -401,7 +400,6 @@ void State<densmat_t>::set_config(const Config &config) {
 
   // Set threshold for truncating snapshots
   json_chop_threshold_ = config.chop_threshold;
-  uint_t i;
   BaseState::qreg_.set_json_chop_threshold(json_chop_threshold_);
 
   // Set OMP threshold for state update functions

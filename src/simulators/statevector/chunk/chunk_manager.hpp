@@ -102,7 +102,6 @@ public:
 
 template <typename data_t>
 ChunkManager<data_t>::ChunkManager() {
-  int i, j;
   num_places_ = 1;
   chunk_bits_ = 0;
   num_chunks_ = 0;

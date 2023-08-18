@@ -149,7 +149,6 @@ void CacheBlocking::set_blocking(int bits, size_t min_memory, uint_t n_place,
                                  size_t complex_size, bool is_matrix) {
   int chunk_bits = bits;
   uint_t scale = is_matrix ? 2 : 1;
-  size_t size;
 
   // get largest possible chunk bits
   while ((complex_size << (scale * chunk_bits)) > min_memory) {
@@ -301,7 +300,7 @@ void CacheBlocking::define_blocked_qubits(std::vector<Operations::Op> &ops,
                                           reg_t &blockedQubits,
                                           bool crossQubitOnly) const {
   uint_t i, j, iq;
-  int nq, nb;
+  int nq;
   bool exist;
   for (i = 0; i < ops.size(); i++) {
     if (blockedQubits.size() >= block_bits_)
@@ -383,7 +382,7 @@ bool CacheBlocking::can_reorder(
 }
 
 bool CacheBlocking::block_circuit(Circuit &circ, bool doSwap) const {
-  uint_t i, n;
+  uint_t n;
   std::vector<Operations::Op> out;
   std::vector<Operations::Op> queue;
   std::vector<Operations::Op> queue_next;
@@ -523,10 +522,8 @@ uint_t CacheBlocking::add_ops(std::vector<Operations::Op> &ops,
                               bool first, bool crossQubitOnly) const {
   uint_t i, j, iq;
 
-  int nqubitUsed = 0;
   reg_t blockedQubits;
   int nq;
-  bool exist;
   uint_t pos_begin, num_gates_added;
   bool end_block_inserted;
 

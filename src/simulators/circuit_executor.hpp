@@ -409,7 +409,6 @@ void Executor<state_t>::set_parallelization(const Circuit &circ,
   distributed_group_ = myrank_ / distributed_procs_;
 
   distributed_proc_bits_ = 0;
-  int proc_bits = 0;
   uint_t p = distributed_procs_;
   while (p > 1) {
     if ((p & 1) != 0) { // procs is not power of 2

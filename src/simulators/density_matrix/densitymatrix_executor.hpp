@@ -237,7 +237,7 @@ void Executor<densmat_t>::initialize_from_vector(const list_t &vec) {
               << (BasePar::chunk_bits_);
 
           // copy part of state for this chunk
-          uint_t i, row, col;
+          uint_t i;
           list_t vec1(1ull << BasePar::chunk_bits_);
           list_t vec2(1ull << BasePar::chunk_bits_);
 
@@ -260,7 +260,7 @@ void Executor<densmat_t>::initialize_from_vector(const list_t &vec) {
             << (BasePar::chunk_bits_);
 
         // copy part of state for this chunk
-        uint_t i, row, col;
+        uint_t i;
         list_t vec1(1ull << BasePar::chunk_bits_);
         list_t vec2(1ull << BasePar::chunk_bits_);
 
@@ -687,8 +687,9 @@ Executor<densmat_t>::reduced_density_matrix_helper(const reg_t &qubits,
   int_t iChunk;
   uint_t size = 1ull << (BasePar::chunk_bits_ * 2);
   uint_t mask = (1ull << (BasePar::chunk_bits_)) - 1;
+#ifdef _OPENMP
   uint_t num_threads = Base::states_[0].qreg().get_omp_threads();
-
+#endif
   size_t size_required =
       (sizeof(std::complex<double>) << (qubits.size() * 2)) +
       (sizeof(std::complex<double>) << (BasePar::chunk_bits_ * 2)) *
@@ -1282,7 +1283,7 @@ std::vector<reg_t>
 Executor<state_t>::sample_measure(state_t &state, const reg_t &qubits,
                                   uint_t shots,
                                   std::vector<RngEngine> &rng) const {
-  int_t i, j;
+  int_t i;
   std::vector<double> rnds;
   rnds.reserve(shots);
 

@@ -478,7 +478,6 @@ if(AER_THRUST_SUPPORTED)
                                  -Wno-inconsistent-missing-override
                                  -Wno-cast-align
                                  -Wno-float-equal
-                                 -Wno-unused-variable
                                  -Wno-unused-but-set-variable
                                  -Wno-switch
                                  -Wno-writable-strings

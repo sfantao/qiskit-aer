@@ -639,7 +639,7 @@ public:
   __host__ __device__ void operator()(const uint_t &i) const {
     thrust::complex<data_t> *vec0;
     thrust::complex<data_t> *vec1 = nullptr;
-    thrust::complex<data_t> q0, q1, t0, t1;
+    thrust::complex<data_t> q0, q1;
     thrust::complex<data_t> s0, s1;
 
     uint_t irow, icol, gid, local_mask, gcid;
@@ -801,7 +801,7 @@ public:
     thrust::complex<data_t> *vec1;
     thrust::complex<data_t> *vec2;
     thrust::complex<data_t> *vec3;
-    thrust::complex<data_t> q0, q1, q2, q3;
+    thrust::complex<data_t> q1, q2, q3;
 
     vec0 = this->data_;
     vec1 = vec0 + offset;
@@ -1323,7 +1323,6 @@ public:
   bool is_diagonal(void) { return true; }
 
   __host__ __device__ void operator()(const uint_t &i) const {
-    thrust::complex<data_t> q;
     thrust::complex<data_t> *vec;
     double scale;
     uint_t *qubits;

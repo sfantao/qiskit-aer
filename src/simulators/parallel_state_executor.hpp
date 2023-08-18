@@ -873,12 +873,11 @@ void ParallelStateExecutor<state_t>::initialize_from_vector(const list_t &vec) {
 template <class state_t>
 template <typename list_t>
 void ParallelStateExecutor<state_t>::initialize_from_matrix(const list_t &mat) {
-  int_t iChunk;
   if (chunk_omp_parallel_ && Base::num_groups_ > 1) {
-#pragma omp parallel for private(iChunk)
+#pragma omp parallel for
     for (int_t ig = 0; ig < Base::num_groups_; ig++) {
-      for (iChunk = Base::top_state_of_group_[ig];
-           iChunk < Base::top_state_of_group_[ig + 1]; iChunk++) {
+      for (int_t iChunk = Base::top_state_of_group_[ig];
+                  iChunk < Base::top_state_of_group_[ig + 1]; iChunk++) {
         list_t tmp(1ull << (chunk_bits_), 1ull << (chunk_bits_));
         uint_t irow_chunk = ((iChunk + Base::global_state_index_) >>
                              ((Base::num_qubits_ - chunk_bits_)))
@@ -889,8 +888,7 @@ void ParallelStateExecutor<state_t>::initialize_from_matrix(const list_t &mat) {
             << (chunk_bits_);
 
         // copy part of state for this chunk
-        uint_t i, row, col;
-        for (i = 0; i < (1ull << (chunk_bits_ * qubit_scale())); i++) {
+        for (int_t i = 0; i < (1ull << (chunk_bits_ * qubit_scale())); i++) {
           uint_t icol = i & ((1ull << chunk_bits_) - 1);
           uint_t irow = i >> chunk_bits_;
           tmp[i] = mat[icol_chunk + icol +
@@ -900,7 +898,7 @@ void ParallelStateExecutor<state_t>::initialize_from_matrix(const list_t &mat) {
       }
     }
   } else {
-    for (iChunk = 0; iChunk < Base::num_local_states_; iChunk++) {
+    for (int_t iChunk = 0; iChunk < Base::num_local_states_; iChunk++) {
       list_t tmp(1ull << (chunk_bits_), 1ull << (chunk_bits_));
       uint_t irow_chunk = ((iChunk + Base::global_state_index_) >>
                            ((Base::num_qubits_ - chunk_bits_)))
@@ -910,8 +908,7 @@ void ParallelStateExecutor<state_t>::initialize_from_matrix(const list_t &mat) {
                           << (chunk_bits_);
 
       // copy part of state for this chunk
-      uint_t i, row, col;
-      for (i = 0; i < (1ull << (chunk_bits_ * qubit_scale())); i++) {
+      for (int_t i = 0; i < (1ull << (chunk_bits_ * qubit_scale())); i++) {
         uint_t icol = i & ((1ull << chunk_bits_) - 1);
         uint_t irow = i >> chunk_bits_;
         tmp[i] =
@@ -928,7 +925,9 @@ auto ParallelStateExecutor<state_t>::apply_to_matrix(bool copy) {
   int_t iChunk;
   uint_t size = 1ull << (chunk_bits_ * qubit_scale());
   uint_t mask = (1ull << (chunk_bits_)) - 1;
+#ifdef _OPENMP
   uint_t num_threads = Base::states_[0].qreg().get_omp_threads();
+#endif
 
   size_t size_required =
       2 * (sizeof(std::complex<double>) << (Base::num_qubits_ * 2)) +
@@ -1052,9 +1051,7 @@ void ParallelStateExecutor<state_t>::apply_global_phase() {
 
 template <class state_t>
 void ParallelStateExecutor<state_t>::apply_chunk_swap(const reg_t &qubits) {
-  uint_t nLarge = 1;
   uint_t q0, q1;
-  int_t iChunk;
 
   q0 = qubits[qubits.size() - 2];
   q1 = qubits[qubits.size() - 1];
@@ -1354,7 +1351,9 @@ void ParallelStateExecutor<state_t>::apply_multi_chunk_swap(
     // all-to-all
     // send data
     for (uint_t iswap = 1; iswap < nchunk; iswap++) {
+#ifdef AER_MPI
       uint_t sizeRecv, sizeSend;
+#endif
       uint_t num_local_swap = 0;
       for (i1 = 0; i1 < nchunk; i1++) {
         i2 = i1 ^ iswap;
@@ -1474,8 +1473,6 @@ void ParallelStateExecutor<state_t>::apply_multi_chunk_swap(
 
 template <class state_t>
 void ParallelStateExecutor<state_t>::apply_chunk_x(const uint_t qubit) {
-  int_t iChunk;
-  uint_t nLarge = 1;
 
   if (qubit < chunk_bits_ * qubit_scale()) {
     auto apply_mcx = [this, qubit](int_t ig) {
@@ -1488,9 +1485,10 @@ void ParallelStateExecutor<state_t>::apply_chunk_x(const uint_t qubit) {
         (chunk_omp_parallel_ && Base::num_groups_ > 1), 0, Base::num_groups_,
         apply_mcx);
   } else { // exchange over chunks
-    int_t iPair;
     uint_t nPair, mask;
+#ifdef AER_MPI
     uint_t baseChunk, iChunk1, iChunk2;
+#endif
     reg_t qubits(2);
     qubits[0] = qubit;
     qubits[1] = qubit;

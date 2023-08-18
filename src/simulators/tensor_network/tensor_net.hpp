@@ -772,7 +772,6 @@ void TensorNet<data_t>::apply_multiplexer(const reg_t &control_qubits,
   for (const auto &q : control_qubits) {
     qubits.push_back(q);
   }
-  size_t N = qubits.size();
 
   cvector_t<double> matMP(DIM * DIM, 0.0);
   uint_t b, i, j;
@@ -798,7 +797,6 @@ void TensorNet<data_t>::apply_diagonal_matrix(const reg_t &qubits,
     mat[i * (diag.size() + 1)] = diag[i];
   }
 
-  Tensor<data_t> *t = new Tensor<data_t>;
   add_tensor(qubits, mat);
 }
 

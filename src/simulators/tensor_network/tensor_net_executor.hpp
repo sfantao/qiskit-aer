@@ -286,7 +286,6 @@ void Executor<state_t>::apply_kraus(CircuitExecutor::Branch &root,
   // So we only compute probabilities for the first N-1 kraus operators
   // and infer the probability of the last one from 1 - sum of the previous
 
-  double r;
   double accum = 0.;
   double p;
   bool complete = false;

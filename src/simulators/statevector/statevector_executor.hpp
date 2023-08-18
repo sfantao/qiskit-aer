@@ -1625,7 +1625,6 @@ void Executor<state_t>::apply_kraus(CircuitExecutor::Branch &root,
   // So we only compute probabilities for the first N-1 kraus operators
   // and infer the probability of the last one from 1 - sum of the previous
 
-  double r;
   double accum = 0.;
   double p;
   bool complete = false;
@@ -1773,7 +1772,7 @@ std::vector<reg_t>
 Executor<state_t>::sample_measure(state_t &state, const reg_t &qubits,
                                   uint_t shots,
                                   std::vector<RngEngine> &rng) const {
-  int_t i, j;
+  int_t i;
   std::vector<double> rnds;
   rnds.reserve(shots);
 

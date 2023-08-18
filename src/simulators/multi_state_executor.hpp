@@ -448,8 +448,6 @@ void MultiStateExecutor<state_t>::run_circuit_with_shot_branching(
 
   std::vector<ExperimentResult> par_results(par_shots);
 
-  uint_t num_shots_saved = 0;
-
   // loop until all local shots are simulated
   while (shots_storage.size() > 0) {
     uint_t num_active_states = 1;
@@ -771,10 +769,6 @@ void MultiStateExecutor<state_t>::measure_sampler(InputIterator first_meas,
   }
 
   // Process samples
-  uint_t num_memory =
-      (memory_map.empty()) ? 0ULL : 1 + memory_map.rbegin()->first;
-  uint_t num_registers =
-      (register_map.empty()) ? 0ULL : 1 + register_map.rbegin()->first;
   ClassicalRegister creg;
   for (int_t i = 0; i < all_samples.size(); i++) {
     creg = state.creg();

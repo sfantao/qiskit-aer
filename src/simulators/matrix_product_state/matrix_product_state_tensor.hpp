@@ -546,7 +546,9 @@ void MPS_Tensor::contract_2_dimensions(const MPS_Tensor &left_gamma,
     throw std::runtime_error("left_size != right_size");
   result.resize(left_rows, right_columns);
 
+#ifdef _OPENMP
   uint_t omp_limit = left_rows * right_columns;
+#endif
 
 #ifdef _WIN32
 #pragma omp parallel for if ((omp_limit > MATRIX_OMP_THRESHOLD) &&             \
