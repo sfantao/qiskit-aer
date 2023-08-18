@@ -667,10 +667,10 @@ double Clifford::expval_pauli(const reg_t &qubits, const std::string &pauli) {
   for (size_t i = 0; i < num_qubits_; i++) {
     size_t num_anti = 0;
     for (const auto &qubit : qubits) {
-      if (P.Z[qubit] & stabilizer_table_[qubit].X[i]) {
+      if (P.Z[qubit] && stabilizer_table_[qubit].X[i]) {
         num_anti++;
       }
-      if (P.X[qubit] & stabilizer_table_[qubit].Z[i]) {
+      if (P.X[qubit] && stabilizer_table_[qubit].Z[i]) {
         num_anti++;
       }
     }
@@ -686,10 +686,10 @@ double Clifford::expval_pauli(const reg_t &qubits, const std::string &pauli) {
     // Check if destabilizer anti-commutes
     size_t num_anti = 0;
     for (const auto &qubit : qubits) {
-      if (P.Z[qubit] & destabilizer_table_[qubit].X[i]) {
+      if (P.Z[qubit] && destabilizer_table_[qubit].X[i]) {
         num_anti++;
       }
-      if (P.X[qubit] & destabilizer_table_[qubit].Z[i]) {
+      if (P.X[qubit] && destabilizer_table_[qubit].Z[i]) {
         num_anti++;
       }
     }
@@ -699,8 +699,8 @@ double Clifford::expval_pauli(const reg_t &qubits, const std::string &pauli) {
     // If anti-commutes multiply Pauli by stabilizer
     phase += 2 * (uint_t)stabilizer_phases_[i];
     for (size_t k = 0; k < num_qubits_; k++) {
-      phase += stabilizer_table_[k].Z[i] & stabilizer_table_[k].X[i];
-      phase += 2 * (PZ[k] & stabilizer_table_[k].X[i]);
+      phase += stabilizer_table_[k].Z[i] && stabilizer_table_[k].X[i];
+      phase += 2 * (PZ[k] && stabilizer_table_[k].X[i]);
       PZ.setValue(PZ[k] ^ stabilizer_table_[k].Z[i], k);
     }
   }
