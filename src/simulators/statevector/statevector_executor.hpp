@@ -1627,7 +1627,6 @@ void Executor<state_t>::apply_kraus(CircuitExecutor::Branch &root,
 
   double accum = 0.;
   double p;
-  bool complete = false;
 
   reg_t shot_branch;
   uint_t nshots;
@@ -1662,7 +1661,6 @@ void Executor<state_t>::apply_kraus(CircuitExecutor::Branch &root,
       }
     }
     if (nshots_multiplied >= nshots) {
-      complete = true;
       break;
     }
   }

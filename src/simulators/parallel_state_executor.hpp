@@ -877,7 +877,7 @@ void ParallelStateExecutor<state_t>::initialize_from_matrix(const list_t &mat) {
 #pragma omp parallel for
     for (int_t ig = 0; ig < Base::num_groups_; ig++) {
       for (int_t iChunk = Base::top_state_of_group_[ig];
-                  iChunk < Base::top_state_of_group_[ig + 1]; iChunk++) {
+           iChunk < Base::top_state_of_group_[ig + 1]; iChunk++) {
         list_t tmp(1ull << (chunk_bits_), 1ull << (chunk_bits_));
         uint_t irow_chunk = ((iChunk + Base::global_state_index_) >>
                              ((Base::num_qubits_ - chunk_bits_)))

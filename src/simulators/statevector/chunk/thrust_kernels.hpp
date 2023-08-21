@@ -825,7 +825,7 @@ public:
   int qubits_count(void) { return 4; }
 
   __host__ __device__ void operator()(const uint_t &i) const {
-    uint_t i0, i1, i2, i3, i4, offset, f0, f1, f2;
+    uint_t i0, i1, i2, i3, i4, offset;
     thrust::complex<data_t> *vec;
     thrust::complex<data_t> q0, q1, q2, q3, q4, q5, q6, q7;
     thrust::complex<data_t> q8, q9, q10, q11, q12, q13, q14, q15;
@@ -865,9 +865,6 @@ public:
     q15 = vec[i0 + offset3 + offset2 + offset1 + offset0];
 
     offset = 0;
-    f0 = 0;
-    f1 = 0;
-    f2 = 0;
     for (j = 0; j < 16; j++) {
       r = pMat[0 + j] * q0;
       r += pMat[16 + j] * q1;

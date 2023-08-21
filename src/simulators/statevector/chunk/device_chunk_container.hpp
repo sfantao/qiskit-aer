@@ -319,7 +319,6 @@ uint_t DeviceChunkContainer<data_t>::Allocate(int idev, int chunk_bits,
                                               bool density_matrix) {
   uint_t nc = chunks;
   uint_t i;
-  int mat_bits;
 
   this->chunk_bits_ = chunk_bits;
   this->num_qubits_ = num_qubits;
@@ -354,13 +353,11 @@ uint_t DeviceChunkContainer<data_t>::Allocate(int idev, int chunk_bits,
 
   if (multi_shots) { // mult-shot parallelization for small qubits
     multi_shots_ = true;
-    mat_bits = AER_DEFAULT_MATRIX_BITS;
     nc = chunks;
     num_matrices_ = chunks;
   } else {
     multi_shots_ = false;
 
-    mat_bits = AER_DEFAULT_MATRIX_BITS;
     num_matrices_ = 1;
     nc = chunks;
   }
