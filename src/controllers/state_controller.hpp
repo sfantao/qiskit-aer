@@ -901,7 +901,7 @@ AER::Vector<complex_t> AerState::move_to_vector() {
             .value()["s"]
             .value());
     clear();
-    return std::move(vec);
+    return vec;
   } else if (method_ == Method::density_matrix) {
     auto mat =
         std::move(static_cast<DataMap<AverageData, matrix<complex_t>, 1>>(
@@ -911,7 +911,7 @@ AER::Vector<complex_t> AerState::move_to_vector() {
     auto vec = Vector<complex_t>::move_from_buffer(
         mat.GetColumns() * mat.GetRows(), mat.move_to_buffer());
     clear();
-    return std::move(vec);
+    return vec;
   } else {
     throw std::runtime_error("move_to_vector() supports only statevector or "
                              "matrix_product_state or density_matrix methods");
@@ -960,7 +960,7 @@ matrix<complex_t> AerState::move_to_matrix() {
                 .value())["s"]
             .value());
     clear();
-    return std::move(mat);
+    return mat;
   } else {
     throw std::runtime_error("move_to_matrix() supports only statevector or "
                              "matrix_product_state or density_matrix methods");

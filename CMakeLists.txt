@@ -484,7 +484,6 @@ if(AER_THRUST_SUPPORTED)
                                  -Wno-writable-strings
                                  -Wno-shadow
                                  -Wno-delete-non-abstract-non-virtual-dtor
-                                 -Wno-pessimizing-move
                                  -Wno-return-type-c-linkage
                                  -Wno-overloaded-virtual
                                  -Wno-braced-scalar-init)
