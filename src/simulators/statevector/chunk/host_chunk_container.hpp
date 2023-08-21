@@ -48,11 +48,14 @@ public:
 
   void StoreMatrix(const std::vector<std::complex<double>> &mat,
                    uint_t iChunk) const override {
-    matrix_[iChunk] = (thrust::complex<double> *)&mat[0];
+
+    matrix_[iChunk] = const_cast<thrust::complex<double> *>(
+        assert_alignment<const thrust::complex<double>>(&mat[0]));
   }
   void StoreMatrix(const std::complex<double> *mat, uint_t iChunk,
                    uint_t size) const override {
-    matrix_[iChunk] = (thrust::complex<double> *)mat;
+    matrix_[iChunk] = const_cast<thrust::complex<double> *>(
+        assert_alignment<const thrust::complex<double>>(mat));
   }
 
   void StoreUintParams(const std::vector<uint_t> &prm,

@@ -15,6 +15,7 @@
 #ifndef _qv_chunk_container_hpp_
 #define _qv_chunk_container_hpp_
 
+#include "misc/assert_alignment.hpp"
 #include "misc/warnings.hpp"
 DISABLE_WARNING_PUSH
 #ifdef AER_THRUST_CUDA
@@ -661,7 +662,7 @@ void ChunkContainer<data_t>::ExecuteSum2(double *pSum, Function func,
     nb = 1;
     nt = func.size(chunk_bits_);
     thrust::complex<double> *buf =
-        (thrust::complex<double> *)reduce_buffer(iChunk);
+        assert_alignment<thrust::complex<double>>(reduce_buffer(iChunk));
 
     if (pSum) { // sum for all chunks are gathered and stored to pSum
       buf_size = 0;
@@ -748,7 +749,7 @@ void ChunkContainer<data_t>::ExecuteSum2(double *pSum, Function func,
     thrust::complex<double> ret, zero = 0.0;
     ret = thrust::transform_reduce(thrust::seq, ci, ci + size, func, zero,
                                    complex_sum());
-    *((thrust::complex<double> *)pSum) = ret;
+    *assert_alignment<thrust::complex<double>>(pSum) = ret;
   }
 #else
   uint_t size = func.size(chunk_bits_);
@@ -894,7 +895,8 @@ void ChunkContainer<data_t>::apply_phase(const uint_t iChunk,
                                          const int_t control_bits,
                                          const std::complex<double> phase,
                                          const uint_t gid, const uint_t count) {
-  Execute(phase_func<data_t>(qubits, *(thrust::complex<double> *)&phase),
+  Execute(phase_func<data_t>(
+              qubits, *assert_alignment<const thrust::complex<double>>(&phase)),
           iChunk, gid, count);
 }
 

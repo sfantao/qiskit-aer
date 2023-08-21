@@ -750,7 +750,8 @@ template <typename data_t>
 cvector_t<data_t> QubitVectorThrust<data_t>::vector() const {
   cvector_t<data_t> ret(data_size_, 0.);
 
-  chunk_.CopyOut((thrust::complex<data_t> *)&ret[0], data_size_);
+  chunk_.CopyOut(assert_alignment<thrust::complex<data_t>>(&ret[0]),
+                 data_size_);
 
 #ifdef AER_DEBUG
   DebugMsg("vector");
@@ -769,7 +770,8 @@ template <typename data_t>
 AER::Vector<std::complex<data_t>>
 QubitVectorThrust<data_t>::copy_to_vector() const {
   cvector_t<data_t> ret(data_size_, 0.);
-  chunk_.CopyOut((thrust::complex<data_t> *)&ret[0], data_size_);
+  chunk_.CopyOut(assert_alignment<thrust::complex<data_t>>(&ret[0]),
+                 data_size_);
 
 #ifdef AER_DEBUG
   DebugMsg("copy_to_vector");
@@ -782,7 +784,8 @@ QubitVectorThrust<data_t>::copy_to_vector() const {
 template <typename data_t>
 AER::Vector<std::complex<data_t>> QubitVectorThrust<data_t>::move_to_vector() {
   cvector_t<data_t> ret(data_size_, 0.);
-  chunk_.CopyOut((thrust::complex<data_t> *)&ret[0], data_size_);
+  chunk_.CopyOut(assert_alignment<thrust::complex<data_t>>(&ret[0]),
+                 data_size_);
 
 #ifdef AER_DEBUG
   DebugMsg("move_to_vector", ret[0]);
@@ -1271,7 +1274,9 @@ void QubitVectorThrust<data_t>::initialize_from_data(
   DebugMsg("calling initialize_from_data");
 #endif
 
-  chunk_.CopyIn((thrust::complex<data_t> *)(statevec), data_size_);
+  chunk_.CopyIn(const_cast<thrust::complex<data_t> *>(
+                    assert_alignment<const thrust::complex<data_t>>(statevec)),
+                data_size_);
 
 #ifdef AER_DEBUG
   DebugMsg("initialize_from_data");

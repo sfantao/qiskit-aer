@@ -762,7 +762,7 @@ template <typename data_t>
 void DensityMatrixThrust<data_t>::apply_phase(const uint_t q,
                                               const complex_t &phase) {
   BaseVector::apply_function(DensityPhase<data_t>(
-      q, (thrust::complex<double> *)&phase,
+      q, assert_alignment<thrust::complex<double>>(&phase),
       BaseVector::chunk_manager_->num_qubits() / 2, num_qubits()));
 
 #ifdef AER_DEBUG

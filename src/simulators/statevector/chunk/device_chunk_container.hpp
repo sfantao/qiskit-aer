@@ -1025,14 +1025,14 @@ void DeviceChunkContainer<data_t>::queue_blocked_gate(
       mat[0] = pMat[0];
       mat[1] = pMat[1];
       cudaMemcpyAsync(matrix_pointer(iChunk) + num_blocked_matrix_[iBlock],
-                      (thrust::complex<double> *)&mat[0],
+                      assert_alignment<thrust::complex<double>>(&mat[0]),
                       2 * sizeof(thrust::complex<double>),
                       cudaMemcpyHostToDevice, stream(iChunk));
       num_blocked_matrix_[iBlock] += 2;
     } else if (gate == 'p') { // phase
       mat[0] = pMat[0];
       cudaMemcpyAsync(matrix_pointer(iChunk) + num_blocked_matrix_[iBlock],
-                      (thrust::complex<double> *)&mat[0],
+                      assert_alignment<thrust::complex<double>>(&mat[0]),
                       1 * sizeof(thrust::complex<double>),
                       cudaMemcpyHostToDevice, stream(iChunk));
       num_blocked_matrix_[iBlock] += 1;
@@ -1042,7 +1042,7 @@ void DeviceChunkContainer<data_t>::queue_blocked_gate(
       mat[2] = pMat[3];
       mat[3] = pMat[1];
       cudaMemcpyAsync(matrix_pointer(iChunk) + num_blocked_matrix_[iBlock],
-                      (thrust::complex<double> *)&mat[0],
+                      assert_alignment<thrust::complex<double>>(&mat[0]),
                       4 * sizeof(thrust::complex<double>),
                       cudaMemcpyHostToDevice, stream(iChunk));
       num_blocked_matrix_[iBlock] += 4;

@@ -15,6 +15,8 @@
 #ifndef _aer_misc_wrap_thrust_hpp_
 #define _aer_misc_wrap_thrust_hpp_
 
+#include <memory>
+
 #if defined(__GNUC__) || defined(__clang__)
 #pragma GCC system_header
 #endif
