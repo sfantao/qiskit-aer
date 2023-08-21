@@ -318,7 +318,6 @@ uint_t DeviceChunkContainer<data_t>::Allocate(int idev, int chunk_bits,
                                               int matrix_bit,
                                               bool density_matrix) {
   uint_t nc = chunks;
-  uint_t i;
   int mat_bits;
 
   this->chunk_bits_ = chunk_bits;
@@ -333,7 +332,7 @@ uint_t DeviceChunkContainer<data_t>::Allocate(int idev, int chunk_bits,
   int ip, nd;
   cudaGetDeviceCount(&nd);
   peer_access_.resize(nd);
-  for (i = 0; i < nd; i++) {
+  for (uint_t i = 0; i < nd; i++) {
     ip = 1;
     if (i != device_id_) {
       cudaDeviceCanAccessPeer(&ip, device_id_, i);
@@ -442,7 +441,7 @@ uint_t DeviceChunkContainer<data_t>::Allocate(int idev, int chunk_bits,
   num_blocked_gates_.resize(size);
   num_blocked_matrix_.resize(size);
   num_blocked_qubits_.resize(size);
-  for (i = 0; i < size; i++) {
+  for (int i = 0; i < size; i++) {
     num_blocked_gates_[i] = 0;
     num_blocked_matrix_[i] = 0;
   }

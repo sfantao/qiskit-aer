@@ -1054,7 +1054,6 @@ template <class state_t>
 void ParallelStateExecutor<state_t>::apply_chunk_swap(const reg_t &qubits) {
   uint_t nLarge = 1;
   uint_t q0, q1;
-  int_t iChunk;
 
   q0 = qubits[qubits.size() - 2];
   q1 = qubits[qubits.size() - 1];
@@ -1474,7 +1473,6 @@ void ParallelStateExecutor<state_t>::apply_multi_chunk_swap(
 
 template <class state_t>
 void ParallelStateExecutor<state_t>::apply_chunk_x(const uint_t qubit) {
-  int_t iChunk;
   uint_t nLarge = 1;
 
   if (qubit < chunk_bits_ * qubit_scale()) {

@@ -533,12 +533,12 @@ double Executor<state_t>::expval_pauli(const reg_t &qubits,
   reg_t qubits_out_chunk;
   std::string pauli_in_chunk;
   std::string pauli_out_chunk;
-  int_t i, n;
+  int_t n;
   double expval(0.);
 
   // get inner/outer chunk pauli string
   n = pauli.size();
-  for (i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     if (qubits[i] < BasePar::chunk_bits_) {
       qubits_in_chunk.push_back(qubits[i]);
       pauli_in_chunk.push_back(pauli[n - i - 1]);
@@ -670,7 +670,7 @@ double Executor<state_t>::expval_pauli(const reg_t &qubits,
           expval += e_tmp;
         }
       } else {
-        for (i = 0; i < Base::states_.size(); i++) {
+        for (int_t i = 0; i < Base::states_.size(); i++) {
           double sign = 1.0;
           if (z_mask &&
               (AER::Utils::popcount((i + Base::global_state_index_) & z_mask) &
@@ -692,7 +692,7 @@ double Executor<state_t>::expval_pauli(const reg_t &qubits,
         expval += e_tmp;
       }
     } else {
-      for (i = 0; i < Base::states_.size(); i++)
+      for (int_t i = 0; i < Base::states_.size(); i++)
         expval += Base::states_[i].qreg().expval_pauli(qubits, pauli);
     }
   }
@@ -886,7 +886,6 @@ template <class state_t>
 rvector_t Executor<state_t>::measure_probs(const reg_t &qubits) const {
   uint_t dim = 1ull << qubits.size();
   rvector_t sum(dim, 0.0);
-  int_t i, j, k;
   reg_t qubits_in_chunk;
   reg_t qubits_out_chunk;
 
@@ -895,7 +894,7 @@ rvector_t Executor<state_t>::measure_probs(const reg_t &qubits) const {
 
   if (qubits_in_chunk.size() > 0) {
     if (BasePar::chunk_omp_parallel_ && Base::num_groups_ > 1) {
-#pragma omp parallel for private(i, j, k)
+#pragma omp parallel for
       for (int_t ig = 0; ig < Base::num_groups_; ig++) {
         for (int_t i = Base::top_state_of_group_[ig];
              i < Base::top_state_of_group_[ig + 1]; i++) {
@@ -903,15 +902,15 @@ rvector_t Executor<state_t>::measure_probs(const reg_t &qubits) const {
               Base::states_[i].qreg().probabilities(qubits_in_chunk);
 
           if (qubits_in_chunk.size() == qubits.size()) {
-            for (j = 0; j < dim; j++) {
+            for (int_t j = 0; j < dim; j++) {
 #pragma omp atomic
               sum[j] += chunkSum[j];
             }
           } else {
-            for (j = 0; j < chunkSum.size(); j++) {
+            for (int_t j = 0; j < chunkSum.size(); j++) {
               int idx = 0;
               int i_in = 0;
-              for (k = 0; k < qubits.size(); k++) {
+              for (int_t k = 0; k < qubits.size(); k++) {
                 if (qubits[k] < BasePar::chunk_bits_) {
                   idx += (((j >> i_in) & 1) << k);
                   i_in++;
@@ -931,18 +930,18 @@ rvector_t Executor<state_t>::measure_probs(const reg_t &qubits) const {
         }
       }
     } else {
-      for (i = 0; i < Base::states_.size(); i++) {
+      for (uint_t i = 0; i < Base::states_.size(); i++) {
         auto chunkSum = Base::states_[i].qreg().probabilities(qubits_in_chunk);
 
         if (qubits_in_chunk.size() == qubits.size()) {
-          for (j = 0; j < dim; j++) {
+          for (uint_t j = 0; j < dim; j++) {
             sum[j] += chunkSum[j];
           }
         } else {
-          for (j = 0; j < chunkSum.size(); j++) {
+          for (uint_t j = 0; j < chunkSum.size(); j++) {
             int idx = 0;
             int i_in = 0;
-            for (k = 0; k < qubits.size(); k++) {
+            for (uint_t k = 0; k < qubits.size(); k++) {
               if (qubits[k] < BasePar::chunk_bits_) {
                 idx += (((j >> i_in) & 1) << k);
                 i_in++;
@@ -962,13 +961,13 @@ rvector_t Executor<state_t>::measure_probs(const reg_t &qubits) const {
     }
   } else { // there is no bit in chunk
     if (BasePar::chunk_omp_parallel_ && Base::num_groups_ > 1) {
-#pragma omp parallel for private(i, j, k)
+#pragma omp parallel for
       for (int_t ig = 0; ig < Base::num_groups_; ig++) {
         for (int_t i = Base::top_state_of_group_[ig];
              i < Base::top_state_of_group_[ig + 1]; i++) {
           auto nr = std::real(Base::states_[i].qreg().norm());
           int idx = 0;
-          for (k = 0; k < qubits_out_chunk.size(); k++) {
+          for (int_t k = 0; k < qubits_out_chunk.size(); k++) {
             if ((((i + Base::global_state_index_) << (BasePar::chunk_bits_)) >>
                  qubits_out_chunk[k]) &
                 1) {
@@ -980,10 +979,10 @@ rvector_t Executor<state_t>::measure_probs(const reg_t &qubits) const {
         }
       }
     } else {
-      for (i = 0; i < Base::states_.size(); i++) {
+      for (int_t i = 0; i < Base::states_.size(); i++) {
         auto nr = std::real(Base::states_[i].qreg().norm());
         int idx = 0;
-        for (k = 0; k < qubits_out_chunk.size(); k++) {
+        for (int_t k = 0; k < qubits_out_chunk.size(); k++) {
           if ((((i + Base::global_state_index_) << (BasePar::chunk_bits_)) >>
                qubits_out_chunk[k]) &
               1) {
@@ -1506,13 +1505,13 @@ void Executor<state_t>::measure_reset_update(CircuitExecutor::Branch &root,
     for (int_t i = 0; i < 2; i++) {
       cvector_t mdiag(2, 0.);
       mdiag[i] = 1. / std::sqrt(meas_probs[i]);
-
-      Operations::Op op;
-      op.type = OpType::diagonal_matrix;
-      op.qubits = qubits;
-      op.params = mdiag;
-      root.branches()[i]->add_op_after_branch(op);
-
+      {
+        Operations::Op op;
+        op.type = OpType::diagonal_matrix;
+        op.qubits = qubits;
+        op.params = mdiag;
+        root.branches()[i]->add_op_after_branch(op);
+      }
       if (final_state >= 0 && final_state != i) {
         Operations::Op op;
         op.type = OpType::gate;
@@ -1529,13 +1528,13 @@ void Executor<state_t>::measure_reset_update(CircuitExecutor::Branch &root,
     for (int_t i = 0; i < dim; i++) {
       cvector_t mdiag(dim, 0.);
       mdiag[i] = 1. / std::sqrt(meas_probs[i]);
-
-      Operations::Op op;
-      op.type = OpType::diagonal_matrix;
-      op.qubits = qubits;
-      op.params = mdiag;
-      root.branches()[i]->add_op_after_branch(op);
-
+      {
+        Operations::Op op;
+        op.type = OpType::diagonal_matrix;
+        op.qubits = qubits;
+        op.params = mdiag;
+        root.branches()[i]->add_op_after_branch(op);
+      }
       if (final_state >= 0 && final_state != i) {
         // build vectorized permutation matrix
         cvector_t perm(dim * dim, 0.);

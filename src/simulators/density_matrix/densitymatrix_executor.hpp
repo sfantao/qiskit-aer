@@ -222,7 +222,6 @@ void Executor<densmat_t>::initialize_from_vector(const list_t &vec) {
   if ((1ull << (Base::num_qubits_ * 2)) == vec.size()) {
     BasePar::initialize_from_vector(vec);
   } else if ((1ull << (Base::num_qubits_ * 2)) == vec.size() * vec.size()) {
-    int_t iChunk;
     if (BasePar::chunk_omp_parallel_ && Base::num_groups_ > 1) {
 #pragma omp parallel for
       for (int_t ig = 0; ig < Base::num_groups_; ig++) {
@@ -250,7 +249,7 @@ void Executor<densmat_t>::initialize_from_vector(const list_t &vec) {
         }
       }
     } else {
-      for (iChunk = 0; iChunk < Base::states_.size(); iChunk++) {
+      for (int_t iChunk = 0; iChunk < Base::states_.size(); iChunk++) {
         uint_t irow_chunk = ((iChunk + Base::global_state_index_) >>
                              ((Base::num_qubits_ - BasePar::chunk_bits_)))
                             << (BasePar::chunk_bits_);
@@ -1204,11 +1203,13 @@ void Executor<state_t>::measure_reset_update(CircuitExecutor::Branch &root,
       cvector_t mdiag(2, 0.);
       mdiag[i] = 1. / std::sqrt(meas_probs[i]);
 
-      Operations::Op op;
-      op.type = OpType::diagonal_matrix;
-      op.qubits = qubits;
-      op.params = mdiag;
-      root.branches()[i]->add_op_after_branch(op);
+      {
+        Operations::Op op;
+        op.type = OpType::diagonal_matrix;
+        op.qubits = qubits;
+        op.params = mdiag;
+        root.branches()[i]->add_op_after_branch(op);
+      }
 
       if (final_state >= 0 && final_state != i) {
         Operations::Op op;
@@ -1227,11 +1228,13 @@ void Executor<state_t>::measure_reset_update(CircuitExecutor::Branch &root,
       cvector_t mdiag(dim, 0.);
       mdiag[i] = 1. / std::sqrt(meas_probs[i]);
 
-      Operations::Op op;
-      op.type = OpType::diagonal_matrix;
-      op.qubits = qubits;
-      op.params = mdiag;
-      root.branches()[i]->add_op_after_branch(op);
+      {
+        Operations::Op op;
+        op.type = OpType::diagonal_matrix;
+        op.qubits = qubits;
+        op.params = mdiag;
+        root.branches()[i]->add_op_after_branch(op);
+      }
 
       if (final_state >= 0 && final_state != i) {
         // build vectorized permutation matrix

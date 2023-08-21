@@ -381,13 +381,13 @@ template <class state_t>
 void BatchShotsExecutor<state_t>::apply_batched_noise_ops(
     const int_t i_group, const std::vector<std::vector<Operations::Op>> &ops,
     ExperimentResult &result, std::vector<RngEngine> &rng) {
-  int_t i, j, k, count, nop, pos = 0;
+  int_t count, nop, pos = 0;
   uint_t istate = Base::top_state_of_group_[i_group];
   count = ops.size();
 
   reg_t mask(count);
   std::vector<bool> finished(count, false);
-  for (i = 0; i < count; i++) {
+  for (int_t i = 0; i < count; i++) {
     int_t cond_reg = -1;
 
     if (finished[i])
@@ -399,7 +399,7 @@ void BatchShotsExecutor<state_t>::apply_batched_noise_ops(
     mask[i] = 1;
 
     // find same ops to be exectuted in a batch
-    for (j = i + 1; j < count; j++) {
+    for (int_t j = i + 1; j < count; j++) {
       if (finished[j]) {
         mask[j] = 0;
         continue;
@@ -417,7 +417,7 @@ void BatchShotsExecutor<state_t>::apply_batched_noise_ops(
       }
 
       mask[j] = true;
-      for (k = 0; k < ops[i].size(); k++) {
+      for (int_t k = 0; k < ops[i].size(); k++) {
         if (ops[i][k].conditional) {
           cond_reg = ops[i][k].conditional_reg;
         }
@@ -436,7 +436,7 @@ void BatchShotsExecutor<state_t>::apply_batched_noise_ops(
         cond_reg, mask);
 
     // batched execution on same ops
-    for (k = 0; k < ops[i].size(); k++) {
+    for (int_t k = 0; k < ops[i].size(); k++) {
       Operations::Op cop = ops[i][k];
 
       // mark op conditional to mask shots

@@ -482,7 +482,6 @@ if(AER_THRUST_SUPPORTED)
                                  -Wno-unused-but-set-variable
                                  -Wno-switch
                                  -Wno-writable-strings
-                                 -Wno-shadow
                                  -Wno-delete-non-abstract-non-virtual-dtor
                                  -Wno-pessimizing-move
                                  -Wno-return-type-c-linkage

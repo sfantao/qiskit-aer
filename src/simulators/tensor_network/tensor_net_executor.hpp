@@ -167,13 +167,13 @@ void Executor<state_t>::measure_reset_update(CircuitExecutor::Branch &root,
     for (int_t i = 0; i < 2; i++) {
       cvector_t<double> mdiag(2, 0.);
       mdiag[i] = 1. / std::sqrt(meas_probs[i]);
-
-      Operations::Op op;
-      op.type = OpType::diagonal_matrix;
-      op.qubits = qubits;
-      op.params = mdiag;
-      root.branches()[i]->add_op_after_branch(op);
-
+      {
+        Operations::Op op;
+        op.type = OpType::diagonal_matrix;
+        op.qubits = qubits;
+        op.params = mdiag;
+        root.branches()[i]->add_op_after_branch(op);
+      }
       if (final_state >= 0 && final_state != i) {
         Operations::Op op;
         op.type = OpType::gate;
@@ -190,13 +190,13 @@ void Executor<state_t>::measure_reset_update(CircuitExecutor::Branch &root,
     for (int_t i = 0; i < dim; i++) {
       cvector_t<double> mdiag(dim, 0.);
       mdiag[i] = 1. / std::sqrt(meas_probs[i]);
-
-      Operations::Op op;
-      op.type = OpType::diagonal_matrix;
-      op.qubits = qubits;
-      op.params = mdiag;
-      root.branches()[i]->add_op_after_branch(op);
-
+      {
+        Operations::Op op;
+        op.type = OpType::diagonal_matrix;
+        op.qubits = qubits;
+        op.params = mdiag;
+        root.branches()[i]->add_op_after_branch(op);
+      }
       if (final_state >= 0 && final_state != i) {
         // build vectorized permutation matrix
         cvector_t<double> perm(dim * dim, 0.);

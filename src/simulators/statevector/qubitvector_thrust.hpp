@@ -806,8 +806,7 @@ void QubitVectorThrust<data_t>::initialize_component(
     std::sort(qubits_sorted.begin(), qubits_sorted.end());
 
     auto qubits_param = qubits;
-    int i;
-    for (i = 0; i < qubits.size(); i++)
+    for (int i = 0; i < qubits.size(); i++)
       qubits_param.push_back(qubits_sorted[i]);
 
     int nbit = chunk_.container()->matrix_bits();

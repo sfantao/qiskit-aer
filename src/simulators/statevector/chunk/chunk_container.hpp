@@ -507,12 +507,14 @@ void ChunkContainer<data_t>::ExecuteSum(double *pSum, Function func,
               <<<nb, nt, 0, strm>>>(buf, func, buf_size, ntotal);
         }
       }
-      cudaError_t err = cudaGetLastError();
-      if (err != cudaSuccess) {
-        std::stringstream str;
-        str << "ChunkContainer::ExecuteSum in " << func.name() << " : "
-            << cudaGetErrorName(err);
-        throw std::runtime_error(str.str());
+      {
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+          std::stringstream str;
+          str << "ChunkContainer::ExecuteSum in " << func.name() << " : "
+              << cudaGetErrorName(err);
+          throw std::runtime_error(str.str());
+        }
       }
 
       while (nb > 1) {
@@ -565,12 +567,14 @@ void ChunkContainer<data_t>::ExecuteSum(double *pSum, Function func,
               <<<grid, nt, 0, strm>>>(buf, func, buf_size, ntotal);
         }
       }
-      cudaError_t err = cudaGetLastError();
-      if (err != cudaSuccess) {
-        std::stringstream str;
-        str << "ChunkContainer::ExecuteSum in " << func.name() << " : "
-            << cudaGetErrorName(err);
-        throw std::runtime_error(str.str());
+      {
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+          std::stringstream str;
+          str << "ChunkContainer::ExecuteSum in " << func.name() << " : "
+              << cudaGetErrorName(err);
+          throw std::runtime_error(str.str());
+        }
       }
 
       while (nb > 1) {
@@ -675,12 +679,14 @@ void ChunkContainer<data_t>::ExecuteSum2(double *pSum, Function func,
         dev_apply_function_sum_complex<data_t, Function>
             <<<nb, nt, 0, strm>>>(buf, func, buf_size, ntotal);
       }
-      cudaError_t err = cudaGetLastError();
-      if (err != cudaSuccess) {
-        std::stringstream str;
-        str << "ChunkContainer::ExecuteSum2 in " << func.name() << " : "
-            << cudaGetErrorName(err);
-        throw std::runtime_error(str.str());
+      {
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+          std::stringstream str;
+          str << "ChunkContainer::ExecuteSum2 in " << func.name() << " : "
+              << cudaGetErrorName(err);
+          throw std::runtime_error(str.str());
+        }
       }
 
       while (nb > 1) {
@@ -716,12 +722,14 @@ void ChunkContainer<data_t>::ExecuteSum2(double *pSum, Function func,
         dev_apply_function_sum_complex<data_t, Function>
             <<<grid, nt, 0, strm>>>(buf, func, buf_size, ntotal);
       }
-      cudaError_t err = cudaGetLastError();
-      if (err != cudaSuccess) {
-        std::stringstream str;
-        str << "ChunkContainer::ExecuteSum2 in " << func.name() << " : "
-            << cudaGetErrorName(err);
-        throw std::runtime_error(str.str());
+      {
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+          std::stringstream str;
+          str << "ChunkContainer::ExecuteSum2 in " << func.name() << " : "
+              << cudaGetErrorName(err);
+          throw std::runtime_error(str.str());
+        }
       }
 
       while (nb > 1) {
