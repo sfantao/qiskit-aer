@@ -477,7 +477,6 @@ if(AER_THRUST_SUPPORTED)
                                  -Wno-bitwise-instead-of-logical
                                  -Wno-inconsistent-missing-override
                                  -Wno-cast-align
-                                 -Wno-float-equal
                                  -Wno-unused-variable
                                  -Wno-unused-but-set-variable
                                  -Wno-switch

@@ -978,7 +978,9 @@ public:
         params[nqubits + i] = j;
       }
 
-      if (dmax != 0) {
+      // dmax is computed from absolute values, so should be positive if not
+      // zero.
+      if (dmax > 0.0) {
         c0 = matLU[(i << nqubits) + params[nqubits + i]];
 
         for (j = i + 1; j < matSize; j++) {
