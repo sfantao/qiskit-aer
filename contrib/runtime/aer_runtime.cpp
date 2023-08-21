@@ -13,6 +13,7 @@
  */
 #include "controllers/state_controller.hpp"
 #include <cmath>
+#include <complex.h>
 #include <stdio.h>
 
 // initialize and return state
@@ -61,6 +62,15 @@ double aer_probability(void *handler, uint_t outcome) {
   return state->probability(outcome);
 };
 
+// There is no portable way to spcify a _Complex c99 extension for a C++ build.
+// However, std::complex was designed to be link-compatible with (double
+// complex) C type. Therefore, it is safe to ignore return linkage issues in
+// this API for type complex.
+#ifdef AER_THRUST_ROCM
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
+#endif
+
 // return probability amplitude of a specific bitstring
 complex_t aer_amplitude(void *handler, uint_t outcome) {
   AER::AerState *state = reinterpret_cast<AER::AerState *>(handler);
@@ -74,6 +84,10 @@ complex_t *aer_release_statevector(void *handler) {
   AER::Vector<complex_t> sv = state->move_to_vector();
   return sv.move_to_buffer();
 };
+
+#ifdef AER_THRUST_ROCM
+#pragma clang diagnostic pop
+#endif
 
 // u3 gate
 void aer_apply_u3(void *handler, uint_t qubit, double theta, double phi,
