@@ -150,6 +150,12 @@ protected:
     return ret;
   };
 
+  // Confirm that the previous member is an intended overload of the
+  // sample_measure virtual function.
+private:
+  using MultiStateExecutor<state_t>::sample_measure;
+
+protected:
   // swap between chunks
   virtual void apply_chunk_swap(const reg_t &qubits);
 
