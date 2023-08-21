@@ -37,13 +37,9 @@ public:
 
   uint_t size(void) override { return data_.size(); }
 
-  AERHostVector<thrust::complex<data_t>> &vector(void) {
-    return data_;
-  }
+  AERHostVector<thrust::complex<data_t>> &vector(void) { return data_; }
 
-  thrust::complex<data_t> &operator[](uint_t i) override {
-    return data_[i];
-  }
+  thrust::complex<data_t> &operator[](uint_t i) override { return data_[i]; }
 
   uint_t Allocate(int idev, int chunk_bits, int num_qubits, uint_t chunks,
                   uint_t buffers, bool multi_shots, int matrix_bit,
