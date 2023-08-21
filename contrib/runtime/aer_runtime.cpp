@@ -133,7 +133,7 @@ void aer_apply_t(void *handler, uint_t qubit) {
 // inverse of sqrt(S)
 void aer_apply_tdg(void *handler, uint_t qubit) {
   AER::AerState *state = reinterpret_cast<AER::AerState *>(handler);
-  state->apply_u({qubit}, 0, 0, -M_PI / 4.0);
+  state->apply_u(qubit, 0, 0, -M_PI / 4.0);
 };
 
 // sqrt(NOT) gate

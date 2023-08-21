@@ -486,8 +486,7 @@ if(AER_THRUST_SUPPORTED)
                                  -Wno-delete-non-abstract-non-virtual-dtor
                                  -Wno-pessimizing-move
                                  -Wno-return-type-c-linkage
-                                 -Wno-overloaded-virtual
-                                 -Wno-braced-scalar-init)
+                                 -Wno-overloaded-virtual)
     
     
     if(AER_ENABLE_CUQUANTUM)
