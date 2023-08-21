@@ -306,7 +306,7 @@ void Fuser::allocate_new_operation(oplist_t &ops, const uint_t idx,
       ops[i].type = optype_t::nop;
 }
 
-class CostBasedFusion : public Fuser {
+class CostBasedFusion final : public Fuser {
 public:
   CostBasedFusion() { std::fill_n(costs_, 64, -1); };
 
@@ -337,7 +337,7 @@ private:
 };
 
 template <size_t N>
-class NQubitFusion : public Fuser {
+class NQubitFusion final : public Fuser {
 public:
   NQubitFusion() : opt_name(std::to_string(N) + "_qubits") {}
 
