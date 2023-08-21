@@ -895,6 +895,8 @@ cmatrix_t NoiseModel::op2unitary(const Operations::Op &op) const {
         return Linalg::Matrix::rzx(op.params[0]);
       case ParamGate::cp:
         return Linalg::Matrix::cphase(op.params[0]);
+      case ParamGate::cu:
+        throw std::runtime_error("Unexpected switch enumeration ParamGate::cu");
       }
     } else {
       // Check if we can convert this gate to a standard superoperator matrix
