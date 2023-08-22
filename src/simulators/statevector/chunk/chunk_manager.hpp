@@ -126,7 +126,7 @@ ChunkManager<data_t>::ChunkManager() {
   if (cudaGetDeviceCount(&num_devices_) == cudaSuccess) {
     num_places_ = num_devices_;
   } else {
-    cudaGetLastError();
+    (void)cudaGetLastError();
     num_devices_ = 1;
     num_places_ = 1;
   }
@@ -259,8 +259,8 @@ uint_t ChunkManager<data_t>::Allocate(int chunk_bits, int nqubits,
 
       if (!multi_gpu) {
         size_t freeMem, totalMem;
-        cudaSetDevice(target_gpus_[0]);
-        cudaMemGetInfo(&freeMem, &totalMem);
+        CUDA_CHECK(cudaSetDevice(target_gpus_[0]));
+        CUDA_CHECK(cudaMemGetInfo(&freeMem, &totalMem));
         if (freeMem > (((uint_t)sizeof(thrust::complex<data_t>) *
                         (nchunks + num_buffers + AER_DUMMY_BUFFERS))
                        << chunk_bits_)) {

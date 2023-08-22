@@ -449,7 +449,7 @@ bool AerState::is_gpu(bool raise_error) const {
   int nDev;
   if (cudaGetDeviceCount(&nDev) != cudaSuccess) {
     if (raise_error) {
-      cudaGetLastError();
+      (void)cudaGetLastError();
       throw std::runtime_error("No CUDA device available!");
     } else
       return false;

@@ -272,7 +272,7 @@ void BatchShotsExecutor<state_t>::run_circuit_shots(
   if (Base::sim_device_ == Device::GPU) {
     int nDev;
     if (cudaGetDeviceCount(&nDev) != cudaSuccess) {
-      cudaGetLastError();
+      (void)cudaGetLastError();
       nDev = 0;
     }
     if (nDev > Base::num_groups_)
