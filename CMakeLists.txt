@@ -604,7 +604,7 @@ else() # Standalone build
 
     set_target_properties(${target} PROPERTIES
       LINKER_LANGUAGE CXX
-      CXX_STANDARD 14
+      CXX_STANDARD 17
       COMPILE_FLAGS ${AER_COMPILER_FLAGS}
       LINK_FLAGS ${AER_LINKER_FLAGS}
       RUNTIME_OUTPUT_DIRECTORY_DEBUG Debug

@@ -302,7 +302,7 @@ void Controller::set_config(const Config &config) {
 #endif
     int nDev;
     if (cudaGetDeviceCount(&nDev) != cudaSuccess) {
-      cudaGetLastError();
+      (void)cudaGetLastError();
       throw std::runtime_error("No CUDA device available!");
     }
     sim_device_ = Device::GPU;
@@ -424,13 +424,13 @@ size_t Controller::get_gpu_memory_mb() {
 #ifdef AER_THRUST_GPU
   int iDev, nDev, j;
   if (cudaGetDeviceCount(&nDev) != cudaSuccess) {
-    cudaGetLastError();
+    (void)cudaGetLastError();
     nDev = 0;
   }
   for (iDev = 0; iDev < nDev; iDev++) {
     size_t freeMem, totalMem;
-    cudaSetDevice(iDev);
-    cudaMemGetInfo(&freeMem, &totalMem);
+    CUDA_CHECK(cudaSetDevice(iDev));
+    CUDA_CHECK(cudaMemGetInfo(&freeMem, &totalMem));
     total_physical_memory += totalMem;
   }
 #endif

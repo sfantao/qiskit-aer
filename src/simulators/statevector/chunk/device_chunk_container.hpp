@@ -127,7 +127,7 @@ public:
 
   void set_device(void) const {
 #ifdef AER_THRUST_GPU
-    cudaSetDevice(device_id_);
+    CUDA_CHECK(cudaSetDevice(device_id_));
 #endif
   }
 
@@ -223,11 +223,11 @@ public:
     if (iChunk == 0 && creg_host_update_) {
       creg_host_update_ = false;
 #ifdef AER_THRUST_GPU
-      cudaMemcpyAsync(thrust::raw_pointer_cast(cregs_host_.data()),
-                      thrust::raw_pointer_cast(cregs_.data()),
-                      sizeof(uint_t) * num_matrices_ * n64,
-                      cudaMemcpyDeviceToHost, stream_[0]);
-      cudaStreamSynchronize(stream_[0]);
+      CUDA_CHECK(cudaMemcpyAsync(thrust::raw_pointer_cast(cregs_host_.data()),
+                                 thrust::raw_pointer_cast(cregs_.data()),
+                                 sizeof(uint_t) * num_matrices_ * n64,
+                                 cudaMemcpyDeviceToHost, stream_[0]));
+      CUDA_CHECK(cudaStreamSynchronize(stream_[0]));
 #else
       thrust::copy_n(cregs_.begin(), this->num_chunks_ * n64,
                      cregs_host_.begin());
@@ -247,11 +247,11 @@ public:
     if (iChunk == 0 && creg_host_update_) {
       creg_host_update_ = false;
 #ifdef AER_THRUST_GPU
-      cudaMemcpyAsync(thrust::raw_pointer_cast(cregs_host_.data()),
-                      thrust::raw_pointer_cast(cregs_.data()),
-                      sizeof(uint_t) * num_matrices_ * n64,
-                      cudaMemcpyDeviceToHost, stream_[0]);
-      cudaStreamSynchronize(stream_[0]);
+      CUDA_CHECK(cudaMemcpyAsync(thrust::raw_pointer_cast(cregs_host_.data()),
+                                 thrust::raw_pointer_cast(cregs_.data()),
+                                 sizeof(uint_t) * num_matrices_ * n64,
+                                 cudaMemcpyDeviceToHost, stream_[0]));
+      CUDA_CHECK(cudaStreamSynchronize(stream_[0]));
 #else
       thrust::copy_n(cregs_.begin(), this->num_chunks_ * n64,
                      cregs_host_.begin());
@@ -270,10 +270,10 @@ public:
       creg_dev_update_ = false;
       creg_host_update_ = false;
 #ifdef AER_THRUST_GPU
-      cudaMemcpyAsync(thrust::raw_pointer_cast(cregs_.data()),
-                      thrust::raw_pointer_cast(cregs_host_.data()),
-                      sizeof(uint_t) * num_matrices_ * n64,
-                      cudaMemcpyHostToDevice, stream_[0]);
+      CUDA_CHECK(cudaMemcpyAsync(thrust::raw_pointer_cast(cregs_.data()),
+                                 thrust::raw_pointer_cast(cregs_host_.data()),
+                                 sizeof(uint_t) * num_matrices_ * n64,
+                                 cudaMemcpyHostToDevice, stream_[0]));
 #else
       thrust::copy_n(cregs_host_.begin(), this->num_chunks_ * n64,
                      cregs_.begin());
@@ -291,7 +291,7 @@ public:
   void synchronize(uint_t iChunk) {
 #ifdef AER_THRUST_GPU
     set_device();
-    cudaStreamSynchronize(stream(iChunk));
+    CUDA_CHECK(cudaStreamSynchronize(stream(iChunk)));
 #endif
   }
 
@@ -331,16 +331,16 @@ uint_t DeviceChunkContainer<data_t>::Allocate(int idev, int chunk_bits,
 
 #ifdef AER_THRUST_GPU
   int ip, nd;
-  cudaGetDeviceCount(&nd);
+  CUDA_CHECK(cudaGetDeviceCount(&nd));
   peer_access_.resize(nd);
   for (i = 0; i < nd; i++) {
     ip = 1;
     if (i != device_id_) {
-      cudaDeviceCanAccessPeer(&ip, device_id_, i);
+      CUDA_CHECK(cudaDeviceCanAccessPeer(&ip, device_id_, i));
     }
     if (ip) {
       if (cudaDeviceEnablePeerAccess(i, 0) != cudaSuccess)
-        cudaGetLastError();
+        (void)cudaGetLastError();
       peer_access_[i] = true;
     } else
       peer_access_[i] = false;
@@ -388,7 +388,7 @@ uint_t DeviceChunkContainer<data_t>::Allocate(int idev, int chunk_bits,
                   sizeof(uint_t) * ((this->num_creg_bits_ + 63) >> 6);
 
   size_t freeMem, totalMem;
-  cudaMemGetInfo(&freeMem, &totalMem);
+  CUDA_CHECK(cudaMemGetInfo(&freeMem, &totalMem));
   freeMem -= RESERVE_FOR_THRUST;
   while (freeMem <= ((((nc + buffers) * (uint_t)sizeof(thrust::complex<data_t>))
                       << chunk_bits) +
@@ -421,7 +421,7 @@ uint_t DeviceChunkContainer<data_t>::Allocate(int idev, int chunk_bits,
 #ifdef AER_THRUST_GPU
   stream_.resize(size);
   for (int i = 0; i < size; i++)
-    cudaStreamCreateWithFlags(&stream_[i], cudaStreamNonBlocking);
+    CUDA_CHECK(cudaStreamCreateWithFlags(&stream_[i], cudaStreamNonBlocking));
 
   if (chunk_bits < 10) {
     reduce_buffer_size_ = 1;
@@ -496,7 +496,7 @@ void DeviceChunkContainer<data_t>::Deallocate(void) {
 
 #ifdef AER_THRUST_GPU
   for (int i = 0; i < stream_.size(); i++)
-    cudaStreamDestroy(stream_[i]);
+    CUDA_CHECK(cudaStreamDestroy(stream_[i]));
   stream_.clear();
 #endif
   ChunkContainer<data_t>::deallocate_chunks();
@@ -552,9 +552,9 @@ void DeviceChunkContainer<data_t>::StoreMatrix(
   set_device();
 
 #ifdef AER_THRUST_GPU
-  cudaMemcpyAsync(matrix_pointer(iChunk), &mat[0],
-                  mat.size() * sizeof(thrust::complex<double>),
-                  cudaMemcpyHostToDevice, stream(iChunk));
+  (void)cudaMemcpyAsync(matrix_pointer(iChunk), &mat[0],
+                        mat.size() * sizeof(thrust::complex<double>),
+                        cudaMemcpyHostToDevice, stream(iChunk));
 
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
@@ -584,9 +584,9 @@ void DeviceChunkContainer<data_t>::StoreMatrix(const std::complex<double> *mat,
   set_device();
 
 #ifdef AER_THRUST_GPU
-  cudaMemcpyAsync(matrix_pointer(iChunk), mat,
-                  size * sizeof(thrust::complex<double>),
-                  cudaMemcpyHostToDevice, stream(iChunk));
+  (void)cudaMemcpyAsync(matrix_pointer(iChunk), mat,
+                        size * sizeof(thrust::complex<double>),
+                        cudaMemcpyHostToDevice, stream(iChunk));
 
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
@@ -616,8 +616,9 @@ void DeviceChunkContainer<data_t>::StoreUintParams(
   set_device();
 
 #ifdef AER_THRUST_GPU
-  cudaMemcpyAsync(param_pointer(iChunk), &prm[0], prm.size() * sizeof(uint_t),
-                  cudaMemcpyHostToDevice, stream(iChunk));
+  (void)cudaMemcpyAsync(param_pointer(iChunk), &prm[0],
+                        prm.size() * sizeof(uint_t), cudaMemcpyHostToDevice,
+                        stream(iChunk));
 
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
@@ -647,17 +648,18 @@ void DeviceChunkContainer<data_t>::CopyIn(Chunk<data_t> &src, uint_t iChunk) {
 #ifdef AER_THRUST_GPU
   if (src.device() >= 0) {
     if (peer_access(src.device())) {
-      cudaMemcpyAsync(chunk_pointer(iChunk), src.pointer(),
-                      size * sizeof(thrust::complex<data_t>),
-                      cudaMemcpyDeviceToDevice, stream(iChunk));
+      (void)cudaMemcpyAsync(chunk_pointer(iChunk), src.pointer(),
+                            size * sizeof(thrust::complex<data_t>),
+                            cudaMemcpyDeviceToDevice, stream(iChunk));
     } else {
-      cudaMemcpyPeerAsync(chunk_pointer(iChunk), device_id_, src.pointer(),
-                          src.device(), size, stream(iChunk));
+      (void)cudaMemcpyPeerAsync(chunk_pointer(iChunk), device_id_,
+                                src.pointer(), src.device(), size,
+                                stream(iChunk));
     }
   } else {
-    cudaMemcpyAsync(chunk_pointer(iChunk), src.pointer(),
-                    size * sizeof(thrust::complex<data_t>),
-                    cudaMemcpyHostToDevice, stream(iChunk));
+    (void)cudaMemcpyAsync(chunk_pointer(iChunk), src.pointer(),
+                          size * sizeof(thrust::complex<data_t>),
+                          cudaMemcpyHostToDevice, stream(iChunk));
   }
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
@@ -679,17 +681,18 @@ void DeviceChunkContainer<data_t>::CopyOut(Chunk<data_t> &dest, uint_t iChunk) {
 #ifdef AER_THRUST_GPU
   if (dest.device() >= 0) {
     if (peer_access(dest.device())) {
-      cudaMemcpyAsync(dest.pointer(), chunk_pointer(iChunk),
-                      size * sizeof(thrust::complex<data_t>),
-                      cudaMemcpyDeviceToDevice, stream(iChunk));
+      (void)cudaMemcpyAsync(dest.pointer(), chunk_pointer(iChunk),
+                            size * sizeof(thrust::complex<data_t>),
+                            cudaMemcpyDeviceToDevice, stream(iChunk));
     } else {
-      cudaMemcpyPeerAsync(dest.pointer(), dest.device(), chunk_pointer(iChunk),
-                          device_id_, size, stream(iChunk));
+      (void)cudaMemcpyPeerAsync(dest.pointer(), dest.device(),
+                                chunk_pointer(iChunk), device_id_, size,
+                                stream(iChunk));
     }
   } else {
-    cudaMemcpyAsync(dest.pointer(), chunk_pointer(iChunk),
-                    size * sizeof(thrust::complex<data_t>),
-                    cudaMemcpyDeviceToHost, stream(iChunk));
+    (void)cudaMemcpyAsync(dest.pointer(), chunk_pointer(iChunk),
+                          size * sizeof(thrust::complex<data_t>),
+                          cudaMemcpyDeviceToHost, stream(iChunk));
   }
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
@@ -754,28 +757,30 @@ void DeviceChunkContainer<data_t>::Swap(Chunk<data_t> &src, uint_t iChunk,
     } else {
       thrust::complex<data_t> *pBuffer = buffer_pointer();
       thrust::complex<data_t> *pSrc = src.pointer();
-      cudaMemcpyPeerAsync(pBuffer + dest_offset, device_id_, pSrc + src_offset,
-                          src.device(), size * sizeof(thrust::complex<data_t>),
-                          stream(iChunk));
+      CUDA_CHECK(cudaMemcpyPeerAsync(
+          pBuffer + dest_offset, device_id_, pSrc + src_offset, src.device(),
+          size * sizeof(thrust::complex<data_t>), stream(iChunk)));
       this->Execute(BufferSwap_func<data_t>(chunk_pointer(iChunk) + dest_offset,
                                             pBuffer + dest_offset, size, true),
                     iChunk, 0, 1);
-      cudaMemcpyPeerAsync(
+      CUDA_CHECK(cudaMemcpyPeerAsync(
           pSrc + src_offset, src.device(), pBuffer + dest_offset, device_id_,
-          size * sizeof(thrust::complex<data_t>), stream(iChunk));
+          size * sizeof(thrust::complex<data_t>), stream(iChunk)));
     }
   } else {
     thrust::complex<data_t> *pBuffer = buffer_pointer();
     thrust::complex<data_t> *pSrc = src.pointer();
-    cudaMemcpyAsync(pBuffer + dest_offset, pSrc + src_offset,
-                    size * sizeof(thrust::complex<data_t>),
-                    cudaMemcpyHostToDevice, stream(this->num_chunks_));
+    CUDA_CHECK(cudaMemcpyAsync(pBuffer + dest_offset, pSrc + src_offset,
+                               size * sizeof(thrust::complex<data_t>),
+                               cudaMemcpyHostToDevice,
+                               stream(this->num_chunks_)));
     this->Execute(BufferSwap_func<data_t>(chunk_pointer(iChunk) + dest_offset,
                                           pBuffer + dest_offset, size, true),
                   iChunk, 0, 1);
-    cudaMemcpyAsync(pSrc + src_offset, pBuffer + dest_offset,
-                    size * sizeof(thrust::complex<data_t>),
-                    cudaMemcpyDeviceToHost, stream(this->num_chunks_));
+    CUDA_CHECK(cudaMemcpyAsync(pSrc + src_offset, pBuffer + dest_offset,
+                               size * sizeof(thrust::complex<data_t>),
+                               cudaMemcpyDeviceToHost,
+                               stream(this->num_chunks_)));
   }
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
@@ -853,18 +858,18 @@ reg_t DeviceChunkContainer<data_t>::sample_measure(
     if (i + nshots > SHOTS)
       nshots = SHOTS - i;
 
-    cudaMemcpyAsync(pRnd, &rnds[i], nshots * sizeof(double),
-                    cudaMemcpyHostToDevice, stream(iChunk));
+    CUDA_CHECK(cudaMemcpyAsync(pRnd, &rnds[i], nshots * sizeof(double),
+                               cudaMemcpyHostToDevice, stream(iChunk)));
 
     thrust::lower_bound(thrust_gpu::par.on(stream(iChunk)), iter.begin(),
                         iter.end(), rnd_dev_ptr, rnd_dev_ptr + nshots,
                         params_.begin() + (iBuf * params_buffer_size_),
                         complex_less<data_t>());
 
-    cudaMemcpyAsync(&samples[i], pSmp, nshots * sizeof(uint_t),
-                    cudaMemcpyDeviceToHost, stream(iChunk));
+    CUDA_CHECK(cudaMemcpyAsync(&samples[i], pSmp, nshots * sizeof(uint_t),
+                               cudaMemcpyDeviceToHost, stream(iChunk)));
   }
-  cudaStreamSynchronize(stream(iChunk));
+  CUDA_CHECK(cudaStreamSynchronize(stream(iChunk)));
 #else
   if (this->omp_threads_ > 1) {
     if (dot)
@@ -926,9 +931,9 @@ void DeviceChunkContainer<data_t>::set_blocked_qubits(uint_t iChunk,
   }
 #ifdef AER_THRUST_GPU
   set_device();
-  cudaMemcpyAsync(param_pointer(iChunk), (uint_t *)&qubits_sorted[0],
-                  qubits.size() * sizeof(uint_t), cudaMemcpyHostToDevice,
-                  stream(iChunk));
+  CUDA_CHECK(cudaMemcpyAsync(param_pointer(iChunk), (uint_t *)&qubits_sorted[0],
+                             qubits.size() * sizeof(uint_t),
+                             cudaMemcpyHostToDevice, stream(iChunk)));
 #endif
 
   num_blocked_gates_[iBlock] = 0;
@@ -1014,37 +1019,41 @@ void DeviceChunkContainer<data_t>::queue_blocked_gate(
     }
   }
   set_device();
-  cudaMemcpyAsync((BlockedGateParams *)(param_pointer(iChunk) +
-                                        num_blocked_qubits_[iBlock]) +
-                      num_blocked_gates_[iBlock],
-                  &params, sizeof(BlockedGateParams), cudaMemcpyHostToDevice,
-                  stream(iChunk));
+  CUDA_CHECK(
+      cudaMemcpyAsync((BlockedGateParams *)(param_pointer(iChunk) +
+                                            num_blocked_qubits_[iBlock]) +
+                          num_blocked_gates_[iBlock],
+                      &params, sizeof(BlockedGateParams),
+                      cudaMemcpyHostToDevice, stream(iChunk)));
 
   if (pMat != NULL) {
     if (gate == 'd') { // diagonal matrix
       mat[0] = pMat[0];
       mat[1] = pMat[1];
-      cudaMemcpyAsync(matrix_pointer(iChunk) + num_blocked_matrix_[iBlock],
-                      (thrust::complex<double> *)&mat[0],
-                      2 * sizeof(thrust::complex<double>),
-                      cudaMemcpyHostToDevice, stream(iChunk));
+      CUDA_CHECK(
+          cudaMemcpyAsync(matrix_pointer(iChunk) + num_blocked_matrix_[iBlock],
+                          (thrust::complex<double> *)&mat[0],
+                          2 * sizeof(thrust::complex<double>),
+                          cudaMemcpyHostToDevice, stream(iChunk)));
       num_blocked_matrix_[iBlock] += 2;
     } else if (gate == 'p') { // phase
       mat[0] = pMat[0];
-      cudaMemcpyAsync(matrix_pointer(iChunk) + num_blocked_matrix_[iBlock],
-                      (thrust::complex<double> *)&mat[0],
-                      1 * sizeof(thrust::complex<double>),
-                      cudaMemcpyHostToDevice, stream(iChunk));
+      CUDA_CHECK(
+          cudaMemcpyAsync(matrix_pointer(iChunk) + num_blocked_matrix_[iBlock],
+                          (thrust::complex<double> *)&mat[0],
+                          1 * sizeof(thrust::complex<double>),
+                          cudaMemcpyHostToDevice, stream(iChunk)));
       num_blocked_matrix_[iBlock] += 1;
     } else { // otherwise, 2x2 matrix
       mat[0] = pMat[0];
       mat[1] = pMat[2];
       mat[2] = pMat[3];
       mat[3] = pMat[1];
-      cudaMemcpyAsync(matrix_pointer(iChunk) + num_blocked_matrix_[iBlock],
-                      (thrust::complex<double> *)&mat[0],
-                      4 * sizeof(thrust::complex<double>),
-                      cudaMemcpyHostToDevice, stream(iChunk));
+      CUDA_CHECK(
+          cudaMemcpyAsync(matrix_pointer(iChunk) + num_blocked_matrix_[iBlock],
+                          (thrust::complex<double> *)&mat[0],
+                          4 * sizeof(thrust::complex<double>),
+                          cudaMemcpyHostToDevice, stream(iChunk)));
       num_blocked_matrix_[iBlock] += 4;
     }
   }
@@ -1362,9 +1371,9 @@ void DeviceChunkContainer<data_t>::copy_to_probability_buffer(
     std::vector<double> &buf, int pos) {
 #ifdef AER_THRUST_GPU
   set_device();
-  cudaMemcpyAsync(probability_buffer(0) + pos * this->num_chunks_, &buf[0],
-                  buf.size() * sizeof(double), cudaMemcpyHostToDevice,
-                  stream_[0]);
+  CUDA_CHECK(cudaMemcpyAsync(probability_buffer(0) + pos * this->num_chunks_,
+                             &buf[0], buf.size() * sizeof(double),
+                             cudaMemcpyHostToDevice, stream_[0]));
 #else
   thrust::copy_n(buf.begin(), buf.size(), probability_buffer_.begin());
 #endif

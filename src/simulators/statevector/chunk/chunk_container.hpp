@@ -20,12 +20,28 @@ DISABLE_WARNING_PUSH
 #ifdef AER_THRUST_CUDA
 #include <cuda.h>
 #include <cuda_runtime.h>
+#define GPU_RUNTIME_NAME "CUDA"
 #endif
 #ifdef AER_THRUST_ROCM
 #include "misc/hipify.hpp"
 #include <hip/hip_runtime.h>
+#define GPU_RUNTIME_NAME "HIP"
 #endif
 DISABLE_WARNING_POP
+
+//
+// GPU runtime error check macro
+//
+#define CUDA_CHECK(expr)                                                       \
+  do {                                                                         \
+    cudaError_t rc = (expr);                                                   \
+    if (rc != cudaSuccess) {                                                   \
+      std::stringstream str;                                                   \
+      str << GPU_RUNTIME_NAME << " runtime error in " << __FILE__ << ":"       \
+          << __LINE__ << " : " << #expr;                                       \
+      throw std::runtime_error(str.str());                                     \
+    }                                                                          \
+  } while (0)
 
 #include "misc/wrap_thrust.hpp"
 
@@ -533,7 +549,8 @@ void ChunkContainer<data_t>::ExecuteSum(double *pSum, Function func,
           throw std::runtime_error(str.str());
         }
       }
-      cudaMemcpyAsync(pSum, buf, sizeof(double), cudaMemcpyDeviceToHost, strm);
+      CUDA_CHECK(cudaMemcpyAsync(pSum, buf, sizeof(double),
+                                 cudaMemcpyDeviceToHost, strm));
     } else {
       buf_size = reduce_buffer_size();
 
@@ -701,8 +718,8 @@ void ChunkContainer<data_t>::ExecuteSum2(double *pSum, Function func,
           throw std::runtime_error(str.str());
         }
       }
-      cudaMemcpyAsync(pSum, buf, sizeof(double) * 2, cudaMemcpyDeviceToHost,
-                      strm);
+      CUDA_CHECK(cudaMemcpyAsync(pSum, buf, sizeof(double) * 2,
+                                 cudaMemcpyDeviceToHost, strm));
     } else {
       buf_size = reduce_buffer_size() / 2;
 

@@ -297,7 +297,7 @@ void Executor<state_t>::set_config(const Config &config) {
 #ifdef AER_THRUST_GPU
   int nDev = 0;
   if (cudaGetDeviceCount(&nDev) != cudaSuccess) {
-    cudaGetLastError();
+    (void)cudaGetLastError();
     nDev = 0;
   }
   if (config.target_gpus.has_value()) {
@@ -335,8 +335,8 @@ size_t Executor<state_t>::get_gpu_memory_mb() {
 #ifdef AER_THRUST_GPU
   for (int_t iDev = 0; iDev < target_gpus_.size(); iDev++) {
     size_t freeMem, totalMem;
-    cudaSetDevice(target_gpus_[iDev]);
-    cudaMemGetInfo(&freeMem, &totalMem);
+    CUDA_CHECK(cudaSetDevice(target_gpus_[iDev]));
+    CUDA_CHECK(cudaMemGetInfo(&freeMem, &totalMem));
     total_physical_memory += totalMem;
   }
 #endif
